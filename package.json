@@ -13,6 +13,8 @@
   "author": "Aditya khedekar",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "express-ejs-layouts": "^2.5.1",
+    "mongoose": "^7.4.5"
   }
 }
