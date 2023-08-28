@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const port = 8000;
 const expresslayouts = require('express-ejs-layouts');
-const db = require('./config/mongoose');
+const {db,mongoURL} = require('./config/mongoose');
 const session = require('express-session');
 const passport = require('passport');
 const passportLocal = require('./config/passport-local-startegy');
@@ -40,7 +40,7 @@ app.use(session({
         maxAge:(1000 * 60 * 100)
     },
     store: MongoStore.create({
-        mongoUrl:'mongodb://127.0.0.1:27017/codeil_development',
+        mongoUrl:mongoURL,
         autoRemove: 'disabled'
     })
 }));
