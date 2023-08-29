@@ -1,4 +1,30 @@
-<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/home.css" />
 <h1>Codeil / <%= title %></h1>
 
-   
+<section id="feed-posts">
+  <h4>Posts</h4>
+  <form action="/posts/create" id="new-posts-form" method="post">
+    <textarea
+      name="content"
+      cols="30"
+      rows="4"
+      placeholder="Comment here..."
+    ></textarea>
+    <input type="submit" value="post" />
+  </form>
+
+  <div>
+    <ul>
+      <% for(post of posts){ %>
+
+      <li>
+        <p>
+          <%=post.content%>
+          <br />
+          <small>USER:<%=post.user.name%> </small>
+        </p>
+      </li>
+      <% } %>
+    </ul>
+  </div>
+</section>
