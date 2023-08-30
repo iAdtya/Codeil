@@ -56,3 +56,6 @@ app.listen(port, function (err) {
   }
   console.log(`Server is running on port: ${port}`);
 });
+
+
+// todo try creating a form for comment with each posts and getting the data back to the controller and saving it in the db

@@ -2,21 +2,20 @@
 <h1>Codeil / <%= title %></h1>
 
 <section id="feed-posts">
-  <h4>Posts</h4>
+  <% if (locals.user) {%>
   <form action="/posts/create" id="new-posts-form" method="post">
     <textarea
       name="content"
       cols="30"
       rows="4"
-      placeholder="Comment here..."
+      placeholder="Post here..."
     ></textarea>
     <input type="submit" value="post" />
   </form>
-
+  <%}%>
   <div>
     <ul>
-      <% for(post of posts){ %>
-
+      <% if(locals.user){%> <% for(post of posts){ %>
       <li>
         <p>
           <%=post.content%>
@@ -24,7 +23,12 @@
           <small>USER:<%=post.user.name%> </small>
         </p>
       </li>
-      <% } %>
+      <form action="" id="commenting-on-posts" method="post">
+        <textarea name="comment" cols="20" rows="4" placeholder="Comment">
+        </textarea>
+        <input type="text" value="comment" />
+      </form>
+      <% } %> <%}%>
     </ul>
   </div>
 </section>
