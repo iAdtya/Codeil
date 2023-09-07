@@ -23,3 +23,28 @@ module.exports.create = async function(req, res) {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+module.exports.destroy = async function(req, res) {
+
+  try {
+    const comment = await Comment.findById(req.params.id); // Find the comment using the Comment model
+    if (comment) {
+      if (comment.user == req.user.id) { // Check if the user attempting to delete the comment is the author of the comment
+        const postId = comment.post; // Store the post ID of the comment before deleting it
+        comment.deleteOne(); // Delete the comment
+
+        // Pull the comment's ID from the post's comments array
+        const post = await Post.findByIdAndUpdate(postId, { $pull: { comments: req.params.id } });
+        res.redirect('back');
+      } else {
+        res.status(401).json({ message: 'Unauthorized' });
+      }
+    } else {
+      res.status(404).json({ message: 'Comment not found' });
+    }
+  } catch (err) {
+    console.log('Error in deleting comment:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+
+};

@@ -2,7 +2,7 @@ const Post = require("../models/post");
 
 module.exports.home = async function (req, res) {
   try {
-    // console.log(req.cookies);
+    console.log(req.cookies);
     const posts = await Post.find({})
     .populate('user')
     .populate({
