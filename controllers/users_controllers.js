@@ -1,9 +1,23 @@
 const User = require("../models/user");
 
 module.exports.profile = function (req, res) {
+  const users = User.findById(req.params.id);
   return res.render("user_profile", {
     title: "User Profile",
+    profile_user: users,
   });
+};
+
+//? req.body can be return as an object { name: req.body.name, email: req.body.email, password: req.body.password } but
+//? req.body contains everything so we can directly use req.body
+module.exports.update = (req, res) => {
+  if (req.user.id == req.params.id) {
+    User.findByIdAndUpdate(req.params.id, req.body, (err, user) => {
+      return res.redirect("back");
+    });
+  } else {
+    return res.status(401).send("Unauthorized");
+  }
 };
 
 module.exports.signUp = async function (req, res) {
@@ -63,6 +77,7 @@ module.exports.create = async function (req, res) {
 };
 
 module.exports.createSession = function (req, res) {
+  req.flash("success", "Logged in successfully")
   return res.redirect("/");
 };
 
@@ -71,8 +86,8 @@ module.exports.destroySession = function (req, res) {
     if (err) {
       console.error("Error during logout:", err);
       return res.redirect("/");
-    }
-
+    } 
+    req.flash("success", "Logged out successfully")
     return res.redirect("/");
   });
 };

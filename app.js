@@ -9,8 +9,11 @@ const passport = require("passport");
 const passportLocal = require("./config/passport-local-startegy");
 const MongoStore = require("connect-mongo");
 const { options } = require("./routes");
+const flash = require("connect-flash");
+const customMware = require("./config/middleware");
 
-app.use(express.urlencoded({ extended: true }));
+//? middleware to parse the form data
+app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
 
@@ -47,6 +50,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(passport.setAuthenticatedUser);
+
+app.use(flash());
+app.use(customMware.setFlash);
 
 app.use("/", require("./routes"));
 
