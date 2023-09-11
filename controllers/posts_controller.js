@@ -9,6 +9,17 @@ module.exports.create = async function (req, res) {
             content: req.body.content,
             user: req.user._id
         });
+
+        // todo Check if the request is an AJAX request
+        if(req.xhr){
+            return res.status(200).json({
+                data:{
+                    post:post
+                },
+                message:"Post created!"
+            })
+        }
+
         req.flash('success','Post published')
         //? Post creation successful
         return res.redirect('back');

@@ -1,4 +1,5 @@
 const express = require("express");
+const client = require("prom-client")
 const cookieParser = require("cookie-parser");
 const app = express();
 const port = 8000;
@@ -11,6 +12,12 @@ const MongoStore = require("connect-mongo");
 const { options } = require("./routes");
 const flash = require("connect-flash");
 const customMware = require("./config/middleware");
+
+const collectDefaultMetrics = client.collectDefaultMetrics;
+
+const Registry = client.Registry;
+const register = new Registry();
+collectDefaultMetrics({ register });
 
 //? middleware to parse the form data
 app.use(express.urlencoded({ extended: false }));
@@ -55,6 +62,12 @@ app.use(flash());
 app.use(customMware.setFlash);
 
 app.use("/", require("./routes"));
+
+app.get("/metrics", async (req, res) => {
+  res.setHeader("Content-Type", client.register.contentType);
+  const metrics = await client.register.metrics();
+  res.send(metrics);
+});
 
 app.listen(port, function (err) {
   if (err) {
