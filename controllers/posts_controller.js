@@ -54,6 +54,15 @@ module.exports.destroy = async function (req, res) {
             // Use `await` with `post.remove` to delete the post
             await post.deleteOne();
 
+            if(req.xhr){
+                return res.status(200).json({
+                    data:{
+                        post_id:req.params.id
+                    },
+                    message:"Post deleted"
+                });
+            }
+
             // Use `await` with `Comment.deleteMany` to remove associated comments
             await Comment.deleteMany({ post: req.params.id });
             req.flash('success','Post and associated comments deleted')
