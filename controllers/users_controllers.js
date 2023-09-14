@@ -1,20 +1,47 @@
 const User = require("../models/user");
 
 module.exports.profile = function (req, res) {
-  const users = User.findById(req.params.id);
+  const user = User.findById(req.params.id);
   return res.render("user_profile", {
     title: "User Profile",
-    profile_user: users,
+    profile_user: user,
   });
 };
 
 //? req.body can be return as an object { name: req.body.name, email: req.body.email, password: req.body.password } but
 //? req.body contains everything so we can directly use req.body
 module.exports.update = (req, res) => {
+  // if (req.user.id == req.params.id) {
+  //   User.findByIdAndUpdate(req.params.id, req.body, (err, user) => {
+  //     return res.redirect("back");
+  //   });
+  // } else {
+  //   return res.status(401).send("Unauthorized");
+  // }
+
   if (req.user.id == req.params.id) {
-    User.findByIdAndUpdate(req.params.id, req.body, (err, user) => {
-      return res.redirect("back");
-    });
+    try {
+
+      let user = User.findById(req.params.id);
+      User.uploadedAvatar(req, res, function (err) {
+
+        if(err){
+          console.log("*************Multer Error:", err);
+        }
+        user.name = req.body.name;
+        user.email = req.body.email;
+        
+        if(req.file){
+          user.avatar = User.avatarPath + "/" + req.file.filename;  
+
+        }
+        user.save();
+        return res.redirect("back");
+      });
+    }catch (err) {
+      console.error("Error in update controller:", err);
+      return res.status(500).send("Internal Server Error");
+    }
   } else {
     return res.status(401).send("Unauthorized");
   }
@@ -77,7 +104,7 @@ module.exports.create = async function (req, res) {
 };
 
 module.exports.createSession = function (req, res) {
-  req.flash("success", "Logged in successfully")
+  req.flash("success", "Logged in successfully");
   return res.redirect("/");
 };
 
@@ -86,8 +113,8 @@ module.exports.destroySession = function (req, res) {
     if (err) {
       console.error("Error during logout:", err);
       return res.redirect("/");
-    } 
-    req.flash("success", "Logged out successfully")
+    }
+    req.flash("success", "Logged out successfully");
     return res.redirect("/");
   });
 };

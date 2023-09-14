@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
 
+//? middleware to use static files
 app.use(express.static("./assets"));
 
 app.use(expresslayouts);
