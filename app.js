@@ -20,6 +20,9 @@ app.use(cookieParser());
 //? middleware to use static files
 app.use(express.static("./assets"));
 
+//? make the uploads path available to the browser
+app.use("/uploads", express.static(__dirname + "/uploads"));
+
 app.use(expresslayouts);
 // app.set('layout extractStyles', true);
 // app.set('layout extractScripts', true);
