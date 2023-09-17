@@ -1,5 +1,13 @@
+<style>
+  .comment-list{
+    /* display: flex; */
+    justify-content: center;
+    margin-left: -80px;
+    /* justify-content: space-between; */
+  }
+</style>
 <li>
-  <p>
+  <p class="comment-list">
     <% if (locals.user && locals.user.id == comment.user.id) {%>
     <small>
       <a href="/comments/destroy/<%= comment.id%>">X</a>

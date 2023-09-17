@@ -1,5 +1,6 @@
 const Comment = require('../models/comment');
 const Post = require('../models/post');
+const commentsMailer = require('../mailers/comments_mailer');
 
 module.exports.create = async function(req, res) {
   try {
@@ -11,8 +12,10 @@ module.exports.create = async function(req, res) {
         user: req.user._id,
       });
 
-      post.comments.push(createdComment._id); // Add the comment's ID to the post's comments array
-      await post.save(); // Save the updated post
+      posting.comments.push(createdComment._id); // Add the comment's ID to the post's comments array
+      await posting.save(); // Save the updated post
+
+      commentsMailer.newComment(req.user.email, posting.title, createdComment.content);
 
       res.redirect('/');
     } else {
