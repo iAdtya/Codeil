@@ -1,6 +1,13 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const express = require("express");
+const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const app = express();
+//?load env vars
+// todo add helmet to enhance your API's security
+app.use(helmet());
+ 
 const port = 8000;
 const expresslayouts = require("express-ejs-layouts");
 const { db, mongoURL } = require("./config/mongoose");
@@ -18,6 +25,18 @@ const customMware = require("./config/middleware");
 app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
+
+
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        "script-src": ["'self'", "example.com"],
+      },
+    },
+  })
+);
 
 //? middleware to use static files
 app.use(express.static("./assets"));
