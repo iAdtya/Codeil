@@ -13,46 +13,71 @@ module.exports.profile = async function (req, res) {
 
 //? req.body can be return as an object { name: req.body.name, email: req.body.email, password: req.body.password } but
 //? req.body contains everything so we can directly use req.body
+// if (req.user.id == req.params.id) {
+//   User.findByIdAndUpdate(req.params.id, req.body, (err, user) => {
+//     return res.redirect("back");
+//   });
+// } else {
+//   return res.status(401).send("Unauthorized");
+// }
 module.exports.update = async (req, res) => {
-  // if (req.user.id == req.params.id) {
-  //   User.findByIdAndUpdate(req.params.id, req.body, (err, user) => {
-  //     return res.redirect("back");
-  //   });
-  // } else {
-  //   return res.status(401).send("Unauthorized");
-  // }
-
   if (req.user.id == req.params.id) {
     try {
-
+      // Find the user by ID
       let user = await User.findById(req.params.id);
-      User.uploadedAvatar(req, res, function (err) {
 
-        if(err){
+      // Handle file upload using Multer
+      User.uploadedAvatar(req, res, async function (err) {
+        if (err) {
           console.log("*************Multer Error:", err);
         }
 
+        // Log the uploaded file information
         console.log(req.file);
-        
+
+        // Update user data
         user.name = req.body.name;
         user.email = req.body.email;
-        
-        if(req.file){
 
-          if(user.avatar){
-              fs.unlinkSync(path.join(__dirname, "..", user.avatar));
-              
+        if (req.file) {
+          if (user.avatar) {
+            // Construct the old avatar file path based on the user's existing avatar filename
+            const oldAvatarPath = path.join(__dirname, "..", user.avatar);
+
+            // Check if the old avatar file exists before attempting to unlink it
+            if (fs.existsSync(oldAvatarPath)) {
+              fs.unlinkSync(oldAvatarPath);
+            } else {
+              console.log("Old avatar file does not exist:", oldAvatarPath);
+            }
           }
 
-          user.avatar = User.avatarPath + "/" + req.file.filename;  
+          // Generate a new filename for the avatar
+          const newAvatarFilename = `avatar-${req.user.id}-${Date.now()}.jpg`;
 
+          // Construct the new avatar file path
+          const newAvatarPath = path.join(__dirname, "..", User.avatarPath, newAvatarFilename);
+
+          // Rename the uploaded file to the new filename
+          fs.renameSync(req.file.path, newAvatarPath);
+
+          // Update the user's avatar with the new filename
+          user.avatar = User.avatarPath + "/" + newAvatarFilename;
         }
-        user.save();
-        return res.redirect("back");
+
+        try {
+          // Save the updated user data
+          await user.save();
+          return res.redirect("back");
+        } catch (saveErr) {
+          console.error("Error saving user data:", saveErr);
+          req.flash("error", "Error saving user data.");
+          return res.status(500).send("Internal Server Error");
+        }
       });
-    }catch (err) {
-      req.flash("error", err);
-      // console.error("Error in update controller:", err);
+    } catch (findErr) {
+      console.error("Error finding user by ID:", findErr);
+      req.flash("error", "Error finding user.");
       return res.status(500).send("Internal Server Error");
     }
   } else {
@@ -60,6 +85,8 @@ module.exports.update = async (req, res) => {
     return res.status(401).send("Unauthorized");
   }
 };
+
+
 
 module.exports.signUp = async function (req, res) {
   try {
@@ -132,3 +159,4 @@ module.exports.destroySession = function (req, res) {
     return res.redirect("/");
   });
 };
+
